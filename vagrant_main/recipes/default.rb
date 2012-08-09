@@ -68,12 +68,6 @@ gem_package "compass" do
   provider Chef::Provider::Package::Rubygems
 end
 
-gem_package "foreman" do
-  action :install
-  version "0.26.1"
-  provider Chef::Provider::Package::Rubygems
-end
-
 # Add the vagrant user to the vboxsf group
 group "vboxsf" do
   members 'vagrant'
