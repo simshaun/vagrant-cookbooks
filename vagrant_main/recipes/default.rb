@@ -1,6 +1,5 @@
-# For some reason, a fresh copy of my VM has issues booting up until this runs
 execute "initial-sudo-apt-get-update" do
-  command "apt-get update"
+  command "apt-get update && apt-get -y upgrade"
 end
 
 # Making apache run as the vagrant user simplifies things when you ssh in
@@ -8,6 +7,8 @@ node.set["apache"]["user"] = "vagrant"
 node.set["apache"]["group"] = "vagrant"
 
 require_recipe "apt"
+
+require_recipe "networking_basic"
 
 require_recipe "apache2"
 require_recipe "apache2::mod_php5"
@@ -35,15 +36,13 @@ node[:app][:extra_packages].each do |extra_package|
   package extra_package
 end
 
-# Installs uglifyjs for the vagrant user
-execute "install uglifyjs npm" do
+execute "install_composer" do
+  cwd "/home/vagrant/"
   user "root"
-  # group "vagrant"
-  environment ({'HOME' => '/home/vagrant'})
-  command "npm install uglify-js"
+  command "curl -s https://getcomposer.org/installer | php"
+  command "mv composer.phar /usr/local/bin/composer"
 end
 
-# Had some issues with an upload path not being specified so we set one here
 file "/etc/php5/apache2/conf.d/upload_path.ini" do
   owner "root"
   group "root"
@@ -51,7 +50,6 @@ file "/etc/php5/apache2/conf.d/upload_path.ini" do
   action :create
 end
 
-# Remove the 000-default site
 apache_site "000-default" do
   enable false
 end
@@ -62,13 +60,6 @@ web_app "localhost" do
   docroot node[:app][:docroot]
 end
 
-gem_package "compass" do
-  action :install
-  version "0.11.5"
-  provider Chef::Provider::Package::Rubygems
-end
-
-# Add the vagrant user to the vboxsf group
 group "vboxsf" do
   members 'vagrant'
   append true
