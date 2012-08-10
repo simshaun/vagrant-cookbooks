@@ -37,10 +37,10 @@ node[:app][:extra_packages].each do |extra_package|
 end
 
 execute "install_composer" do
-  cwd "/home/vagrant/"
+  cwd "/tmp"
   user "root"
-  command "curl -s https://getcomposer.org/installer | php"
-  command "mv composer.phar /usr/local/bin/composer"
+  group "root"
+  command "curl -s https://getcomposer.org/installer | php && mv /tmp/composer.phar /usr/local/bin/composer"
 end
 
 file "/etc/php5/apache2/conf.d/upload_path.ini" do
