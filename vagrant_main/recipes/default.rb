@@ -7,22 +7,12 @@ node.set["apache"]["user"] = "vagrant"
 node.set["apache"]["group"] = "vagrant"
 
 require_recipe "apt"
-
 require_recipe "networking_basic"
-
 require_recipe "apache2"
 require_recipe "apache2::mod_php5"
 require_recipe "apache2::mod_rewrite"
 require_recipe "apache2::mod_ssl"
-
 require_recipe "php"
-require_recipe "php::module_curl"
-# require_recipe "php::module_fileinfo"
-require_recipe "php::module_gd"
-require_recipe "php::module_memcache"
-require_recipe "php::module_mysql"
-require_recipe "php::module_sqlite3"
-
 require_recipe "xdebug"
 
 package "nodejs"
@@ -30,6 +20,15 @@ package "npm"
 package "git-core"
 package "memcached"
 package "sqlite"
+
+# Install PHP Extensions
+package "php5-intl"
+package "php5-curl"
+package "php5-sqlite"
+package "php5-gd"
+package "php5-memcache"
+package "php5-mysql"
+package "php-apc"
 
 # These can be defined in the Vagrantfile to install some extra needed packages
 node[:app][:extra_packages].each do |extra_package|
@@ -41,12 +40,6 @@ execute "install_composer" do
   user "root"
   group "root"
   command "curl -s https://getcomposer.org/installer | php && mv /tmp/composer.phar /usr/local/bin/composer"
-end
-
-execute "install_php5intl" do
-  user "root"
-  group "root"
-  command "apt-get install php5-intl"
 end
 
 file "/etc/php5/apache2/conf.d/upload_path.ini" do
