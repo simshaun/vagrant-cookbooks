@@ -5,7 +5,7 @@ require_recipe "mysql::server"
 # Create database
 execute "add-mysql-db" do
   command "/usr/bin/mysql -u root -p#{node[:mysql][:server_root_password]} -e \"" +
-      "CREATE DATABASE web_app;\" " +
+      "CREATE DATABASE vagrant;\" " +
       "mysql"
   action :run
   ignore_failure true
