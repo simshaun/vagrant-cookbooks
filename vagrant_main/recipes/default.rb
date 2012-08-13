@@ -43,6 +43,12 @@ execute "install_composer" do
   command "curl -s https://getcomposer.org/installer | php && mv /tmp/composer.phar /usr/local/bin/composer"
 end
 
+execute "install_php5intl" do
+  user "root"
+  group "root"
+  command "apt-get install php5-intl"
+end
+
 file "/etc/php5/apache2/conf.d/upload_path.ini" do
   owner "root"
   group "root"
