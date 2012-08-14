@@ -42,6 +42,26 @@ execute "install_composer" do
   command "curl -s https://getcomposer.org/installer | php && mv /tmp/composer.phar /usr/local/bin/composer"
 end
 
+template "/etc/php5/apache2/conf.d/custom_conf.ini" do
+  source "php.conf.erb"
+  owner "root"
+  group "root"
+  mode 0644
+  variables({
+    :php_timezone => node[:app][:php_timezone]
+  })
+end
+
+template "/etc/php5/cli/conf.d/custom_conf.ini" do
+  source "php.conf.erb"
+  owner "root"
+  group "root"
+  mode 0644
+  variables({
+    :php_timezone => node[:app][:php_timezone]
+  })
+end
+
 file "/etc/php5/apache2/conf.d/upload_path.ini" do
   owner "root"
   group "root"
@@ -57,6 +77,7 @@ web_app "localhost" do
   server_name node[:app][:server_name]
   server_aliases node[:app][:server_aliases]
   docroot node[:app][:docroot]
+  php_timezone node[:app][:php_timezone]
 end
 
 group "vboxsf" do
