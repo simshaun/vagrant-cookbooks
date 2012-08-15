@@ -30,6 +30,11 @@ package "php5-memcache"
 package "php5-mysql"
 package "php-apc"
 
+# Gems
+gem_package "sass"
+gem_package "compass"
+gem_package "zurb-foundation"
+
 # These can be defined in the Vagrantfile to install some extra needed packages
 node[:app][:extra_packages].each do |extra_package|
   package extra_package
