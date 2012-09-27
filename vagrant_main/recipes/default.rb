@@ -1,6 +1,6 @@
-execute "initial-sudo-apt-get-update" do
-  command "apt-get update && apt-get -y upgrade"
-end
+#execute "initial-sudo-apt-get-update" do
+#  command "apt-get update && apt-get -y upgrade"
+#end
 
 # Making apache run as the vagrant user simplifies things when you ssh in
 node.set["apache"]["user"] = "vagrant"
@@ -31,20 +31,13 @@ package "php5-mysql"
 package "php-apc"
 
 # Gems
+gem_package "less"
 gem_package "sass"
 gem_package "compass"
-gem_package "zurb-foundation"
 
 # These can be defined in the Vagrantfile to install some extra needed packages
 node[:app][:extra_packages].each do |extra_package|
   package extra_package
-end
-
-execute "install_composer" do
-  cwd "/tmp"
-  user "root"
-  group "root"
-  command "curl -s https://getcomposer.org/installer | php && mv /tmp/composer.phar /usr/local/bin/composer"
 end
 
 template "/etc/php5/apache2/conf.d/custom_conf.ini" do
@@ -93,4 +86,11 @@ end
 # This fixes a bug in Ubuntu 11.10
 file "/etc/php5/conf.d/sqlite.ini" do
   action :delete
+end
+
+execute "install_composer" do
+  cwd "/tmp"
+  user "root"
+  group "root"
+  command "curl -s https://getcomposer.org/installer | php -- --install-dir=/bin && ln -s /bin/composer.phar /bin/composer"
 end
