@@ -1,4 +1,4 @@
-#execute "initial-sudo-apt-get-update" do
+#execute "initial-apt-update-n-upgrade" do
 #  command "apt-get update && apt-get -y upgrade"
 #end
 
@@ -40,15 +40,15 @@ node[:app][:extra_packages].each do |extra_package|
   package extra_package
 end
 
-template "/etc/php5/apache2/conf.d/custom_conf.ini" do
-  source "php.conf.erb"
-  owner "root"
-  group "root"
-  mode 0644
-  variables({
-    :php_timezone => node[:app][:php_timezone]
-  })
-end
+#template "/etc/php5/apache2/conf.d/custom_conf.ini" do
+#  source "php.conf.erb"
+#  owner "root"
+#  group "root"
+#  mode 0644
+#  variables({
+#    :php_timezone => node[:app][:php_timezone]
+#  })
+#end
 
 template "/etc/php5/cli/conf.d/custom_conf.ini" do
   source "php.conf.erb"
@@ -56,7 +56,7 @@ template "/etc/php5/cli/conf.d/custom_conf.ini" do
   group "root"
   mode 0644
   variables({
-    :php_timezone => node[:app][:php_timezone]
+    :php_timezone => node[:app][:php_timezone_cli]
   })
 end
 
@@ -71,11 +71,13 @@ apache_site "000-default" do
   enable false
 end
 
-web_app "localhost" do
-  server_name node[:app][:server_name]
-  server_aliases node[:app][:server_aliases]
-  docroot node[:app][:docroot]
-  php_timezone node[:app][:php_timezone]
+node[:app][:web_apps].each do |identifier, app|
+  web_app identifier do
+    server_name app[:server_name]
+    server_aliases app[:server_aliases]
+    docroot app[:guest_docroot]
+    php_timezone app[:php_timezone]
+  end
 end
 
 group "vboxsf" do

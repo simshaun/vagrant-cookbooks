@@ -1,5 +1,2 @@
-default[:app][:server_name]        = "localhost"
-default[:app][:server_aliases]     = ["*.localhost"]
-default[:app][:docroot]            = "/home/vagrant/web-app/web"
-default[:app][:extra_packages]     = []
-default[:app][:php_timezone]       = "America/Chicago"
+default[:app][:php_timezone_cli] = "America/New_York"
+default[:app][:extra_packages]   = []
