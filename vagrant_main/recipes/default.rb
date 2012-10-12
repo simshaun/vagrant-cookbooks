@@ -88,9 +88,10 @@ file "/etc/php5/conf.d/sqlite.ini" do
   action :delete
 end
 
+# Install Composer
 execute "install_composer" do
   cwd "/tmp"
   user "root"
   group "root"
-  command "curl -s https://getcomposer.org/installer | php -- --install-dir=/bin && ln -s /bin/composer.phar /bin/composer"
+  command "curl -s https://getcomposer.org/installer | php -- --install-dir=/bin && rm -f /bin/composer && ln -s /bin/composer.phar /bin/composer"
 end
