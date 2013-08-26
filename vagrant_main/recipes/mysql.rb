@@ -1,6 +1,6 @@
 node.set['mysql']['server_root_password'] = "root"
 
-require_recipe "mysql::server"
+include_recipe "mysql::server"
 
 # Create database
 execute "add-mysql-db" do

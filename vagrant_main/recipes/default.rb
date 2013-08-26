@@ -1,4 +1,4 @@
-#execute "initial-apt-update-n-upgrade" do
+#execute "initial-sudo-apt-get-update" do
 #  command "apt-get update && apt-get -y upgrade"
 #end
 
@@ -6,14 +6,14 @@
 node.set["apache"]["user"] = "vagrant"
 node.set["apache"]["group"] = "vagrant"
 
-require_recipe "apt"
-require_recipe "networking_basic"
-require_recipe "apache2"
-require_recipe "apache2::mod_php5"
-require_recipe "apache2::mod_rewrite"
-require_recipe "apache2::mod_ssl"
-require_recipe "php"
-require_recipe "xdebug"
+include_recipe "apt"
+include_recipe "networking_basic"
+include_recipe "apache2"
+include_recipe "apache2::mod_php5"
+include_recipe "apache2::mod_rewrite"
+include_recipe "apache2::mod_ssl"
+include_recipe "php"
+include_recipe "xdebug"
 
 package "nodejs"
 package "npm"
@@ -40,15 +40,15 @@ node[:app][:extra_packages].each do |extra_package|
   package extra_package
 end
 
-#template "/etc/php5/apache2/conf.d/custom_conf.ini" do
-#  source "php.conf.erb"
-#  owner "root"
-#  group "root"
-#  mode 0644
-#  variables({
-#    :php_timezone => node[:app][:php_timezone]
-#  })
-#end
+template "/etc/php5/apache2/conf.d/custom_conf.ini" do
+  source "php.conf.erb"
+  owner "root"
+  group "root"
+  mode 0644
+  variables({
+    :php_timezone => node[:app][:php_timezone]
+  })
+end
 
 template "/etc/php5/cli/conf.d/custom_conf.ini" do
   source "php.conf.erb"
@@ -56,7 +56,7 @@ template "/etc/php5/cli/conf.d/custom_conf.ini" do
   group "root"
   mode 0644
   variables({
-    :php_timezone => node[:app][:php_timezone_cli]
+    :php_timezone => node[:app][:php_timezone]
   })
 end
 
@@ -71,13 +71,11 @@ apache_site "000-default" do
   enable false
 end
 
-node[:app][:web_apps].each do |identifier, app|
-  web_app identifier do
-    server_name app[:server_name]
-    server_aliases app[:server_aliases]
-    docroot app[:guest_docroot]
-    php_timezone app[:php_timezone]
-  end
+web_app "localhost" do
+  server_name node[:app][:server_name]
+  server_aliases node[:app][:server_aliases]
+  docroot node[:app][:docroot]
+  php_timezone node[:app][:php_timezone]
 end
 
 group "vboxsf" do
@@ -90,10 +88,9 @@ file "/etc/php5/conf.d/sqlite.ini" do
   action :delete
 end
 
-# Install Composer
 execute "install_composer" do
   cwd "/tmp"
   user "root"
   group "root"
-  command "curl -s https://getcomposer.org/installer | php -- --install-dir=/bin && rm -f /bin/composer && ln -s /bin/composer.phar /bin/composer"
+  command "curl -s https://getcomposer.org/installer | php -- --install-dir=/bin && ln -s /bin/composer.phar /bin/composer"
 end
